@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teo Burger Chulavista - Pedidos RadialGo</title>
+    <style>
+        body {
+            background-color: #0f171a; /* Fondo oscuro sutilmente verdoso/gris */
+            color: #f3f3f3;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 15px;
+        }
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: #16201b; /* Tarjeta con tono oscuro elegante */
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #23382d;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        h1 {
+            text-align: center;
+            font-size: 1.6rem;
+            color: #2ecc71; /* Verde principal */
+            margin-bottom: 2px;
+            text-transform: uppercase;
+        }
+        p.subtitle {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #a0aec0;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #2ecc71; /* Verde principal */
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #23382d;
+            padding-bottom: 5px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #1e2a24;
+            border: 1px solid #2f453a;
+            border-radius: 8px;
+            color: #fff;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+        }
+        input:focus, textarea:focus {
+            border-color: #2ecc71;
+            outline: none;
+        }
+        .btn {
+            width: 100%;
+            background: #2ecc71; /* Verde principal para botones */
+            color: #000;
+            font-weight: bold;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #27ae60;
+        }
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a2620;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid #283a31;
+        }
+        .menu-info {
+            flex-grow: 1;
+        }
+        .menu-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .menu-price {
+            font-size: 0.85rem;
+            color: #2ecc71; /* Verde en precios */
+        }
+        .counter-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .counter-btn {
+            background: #2b3e34;
+            color: #fff;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .counter-btn:active {
+            background: #2ecc71;
+            color: #000;
+        }
+        .counter-value {
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+        }
+        .summary-box {
+            background: #1a2620;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        .total-box {
+            background: #1e2a24;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
+            border: 1px solid #2ecc71;
+        }
+        .total-box span {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2ecc71;
+        }
+        .note-text {
+            font-size: 0.75rem;
+            color: #a0aec0;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>TEO BURGER</h1>
+    <p class="subtitle">SUCURSAL CHULAVISTA | IMPULSADO POR RADIAL GO</p>
+
+    <!-- 1. DATOS DE ENTREGA -->
+    <div class="section-title">1. TUS DATOS DE ENTREGA</div>
+    <input type="text" id="nombre" placeholder="Tu Nombre Completo">
+    <input type="tel" id="telefono" placeholder="Teléfono / WhatsApp de contacto">
+    <input type="text" id="calle" placeholder="Calle y Número (#)">
+    <input type="text" id="colonia" placeholder="Colonia">
+    <input type="text" id="referencias" placeholder="Entre qué calles / Referencias visuales">
+
+    <!-- 2. UBICACIÓN Y ENVÍO -->
+    <div class="section-title">2. UBICACIÓN Y ENVÍO GPS</div>
+    <button class="btn" type="button" onclick="obtenerUbicacion()" style="background: #1e2a24; color: #2ecc71; border: 1px solid #2ecc71;">📍 Usar mi ubicación GPS actual</button>
+    <div class="summary-box" id="info-envio" style="text-align: center; margin-top: 8px;">
+        Distancia: <span id="txt-distancia">0 km</span> | Costo Envío: <span id="txt-costo-envio">$0 MXN</span>
+    </div>
+
+    <!-- 3. MENÚ DE PRODUCTOS -->
+    <div class="section-title">3. SELECCIONA TU PEDIDO</div>
+    <p class="note-text">* Los combos incluyen papas individuales y refresco a elección.</p>
+
+    <!-- HAMBURGUESAS -->
+    <div class="menu-item" data-price="120" data-name="Hamburguesa Especial (Sencilla)">
+        <div class="menu-info"><div class="menu-name">Hamburguesa Especial (Sencilla)</div><div class="menu-price">$120 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+    <div class="menu-item" data-price="163" data-name="Hamburguesa Especial (Combo)">
+        <div class="menu-info"><div class="menu-name">Hamburguesa Especial (Combo)</div><div class="menu-price">$163 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+
+    <div class="menu-item" data-price="180" data-name="Hamburguesa Doble (Sencilla)">
+        <div class="menu-info"><div class="menu-name">Hamburguesa Doble (Sencilla)</div><div class="menu-price">$180 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+    <div class="menu-item" data-price="223" data-name="Hamburguesa Doble (Combo)">
+        <div class="menu-info"><div class="menu-name">Hamburguesa Doble (Combo)</div><div class="menu-price">$223 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+
+    <div class="menu-item" data-price="120" data-name="Hamburguesa de Pollo (Sencilla)">
+        <div class="menu-info"><div class="menu-name">Hamburguesa de Pollo (Sencilla)</div><div class="menu-price">$120 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+    <div class="menu-item" data-price="163" data-name="Hamburguesa de Pollo (Combo)">
+        <div class="menu-info"><div class="menu-name">Hamburguesa de Pollo (Combo)</div><div class="menu-price">$163 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+
+    <div class="menu-item" data-price="130" data-name="Hawaiana (Sencilla)">
+        <div class="menu-info"><div class="menu-name">Hawaiana (Sencilla)</div><div class="menu-price">$130 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+    <div class="menu-item" data-price="173" data-name="Hawaiana (Combo)">
+        <div class="menu-info"><div class="menu-name">Hawaiana (Combo)</div><div class="menu-price">$173 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+
+    <div class="menu-item" data-price="130" data-name="Salchiburguer (Sencilla)">
+        <div class="menu-info"><div class="menu-name">Salchiburguer (Sencilla)</div><div class="menu-price">$130 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+    <div class="menu-item" data-price="173" data-name="Salchiburguer (Combo)">
+        <div class="menu-info"><div class="menu-name">Salchiburguer (Combo)</div><div class="menu-price">$173 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+
+    <!-- TORTAS -->
+    <div class="menu-item" data-price="120" data-name="Torta (Sencilla)">
+        <div class="menu-info"><div class="menu-name">Torta (Sencilla)</div><div class="menu-price">$120 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+    <div class="menu-item" data-price="163" data-name="Torta (Combo)">
+        <div class="menu-info"><div class="menu-name">Torta (Combo)</div><div class="menu-price">$163 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+
+    <div class="menu-item" data-price="130" data-name="Torta Chipotle (Sencilla)">
+        <div class="menu-info"><div class="menu-name">Torta Chipotle (Sencilla)</div><div class="menu-price">$130 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+    <div class="menu-item" data-price="173" data-name="Torta Chipotle (Combo)">
+        <div class="menu-info"><div class="menu-name">Torta Chipotle (Combo)</div><div class="menu-price">$173 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+
+    <!-- OTROS PLATILLOS Y COMPLEMENTOS -->
+    <div class="menu-item" data-price="75" data-name="Teito con Papas">
+        <div class="menu-info"><div class="menu-name">Teito con Papas</div><div class="menu-price">$75 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+    <div class="menu-item" data-price="120" data-name="Teito Box">
+        <div class="menu-info"><div class="menu-name">Teito Box</div><div class="menu-price">$120 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+    <div class="menu-item" data-price="80" data-name="Mini Especial">
+        <div class="menu-info"><div class="menu-name">Mini Especial</div><div class="menu-price">$80 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+    <div class="menu-item" data-price="75" data-name="Boneless con Papas">
+        <div class="menu-info"><div class="menu-name">Boneless con Papas</div><div class="menu-price">$75 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+    <div class="menu-item" data-price="35" data-name="Papas Grandes">
+        <div class="menu-info"><div class="menu-name">Papas Grandes</div><div class="menu-price">$35 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+    <div class="menu-item" data-price="80" data-name="Papas / Queso">
+        <div class="menu-info"><div class="menu-name">Papas con Queso</div><div class="menu-price">$80 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+    <div class="menu-item" data-price="30" data-name="Refresco / Agua Fresca">
+        <div class="menu-info"><div class="menu-name">Refresco / Agua Fresca</div><div class="menu-price">$30 MXN</div></div>
+        <div class="counter-controls"><button class="counter-btn" onclick="cambiarCantidad(this, -1)">-</button><span class="counter-value">0</span><button class="counter-btn" onclick="cambiarCantidad(this, 1)">+</button></div>
+    </div>
+
+    <div class="summary-box">
+        Subtotal Comida: <strong id="subtotal-comida">$0 MXN</strong>
+    </div>
+
+    <!-- 4. FORMA DE PAGO -->
+    <div class="section-title">4. FORMA DE PAGO</div>
+    <div style="display: flex; gap: 10px;">
+        <button type="button" class="btn" id="btn-efectivo" onclick="setPago('Efectivo')" style="background: #1e2a24; color: #fff; border: 1px solid #2f453a;">💵 Efectivo</button>
+        <button type="button" class="btn" id="btn-trans" onclick="setPago('Transferencia')" style="background: #1e2a24; color: #fff; border: 1px solid #2f453a;">💳 Transferencia</button>
+    </div>
+
+    <!-- TOTAL GENERAL -->
+    <div class="total-box">
+        TOTAL A PAGAR (INCLUYE ENVÍO)<br>
+        <span id="total-general">$0 MXN</span>
+    </div>
+
+    <button class="btn" onclick="enviarPedido()" style="background: #25D366; color: #000; font-size: 1.1rem; margin-top: 20px;">📲 Enviar Pedido por WhatsApp</button>
+</div>
+
+<script>
+    const localLat = 25.6751635; 
+    const localLng = -100.2115823;
+    let costoEnvioActual = 30;
+    let distanciaKm = 0;
+    let formaPagoSeleccionada = 'Efectivo';
+
+    function cambiarCantidad(btn, cambio) {
+        const counterVal = btn.parentElement.querySelector('.counter-value');
+        let val = parseInt(counterVal.textContent) + cambio;
+        if (val < 0) val = 0;
+        counterVal.textContent = val;
+        calcularTotales();
+    }
+
+    function calcularTotales() {
+        let subtotal = 0;
+        const items = document.querySelectorAll('.menu-item');
+        items.forEach(item => {
+            const precio = parseFloat(item.getAttribute('data-price'));
+            const cantidad = parseInt(item.querySelector('.counter-value').textContent);
+            subtotal += precio * cantidad;
+        });
+
+        document.getElementById('subtotal-comida').textContent = `$${subtotal} MXN`;
+        const totalGeneral = subtotal + costoEnvioActual;
+        document.getElementById('total-general').textContent = `$${totalGeneral} MXN`;
+    }
+
+    function setPago(metodo) {
+        formaPagoSeleccionada = metodo;
+        document.getElementById('btn-efectivo').style.borderColor = metodo === 'Efectivo' ? '#2ecc71' : '#2f453a';
+        document.getElementById('btn-trans').style.borderColor = metodo === 'Transferencia' ? '#2ecc71' : '#2f453a';
+    }
+
+    function obtenerUbicacion() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(position => {
+                const userLat = position.coords.latitude;
+                const userLng = position.coords.longitude;
+                
+                distanciaKm = calcularDistanciaHaversine(localLat, localLng, userLat, userLng);
+                
+                if (distanciaKm <= 2) {
+                    costoEnvioActual = 30;
+                } else {
+                    costoEnvioActual = 30 + Math.ceil(distanciaKm - 2) * 10;
+                }
+
+                document.getElementById('txt-distancia').textContent = `${distanciaKm.toFixed(1)} km`;
+                document.getElementById('txt-costo-envio').textContent = `$${costoEnvioActual} MXN`;
+                calcularTotales();
+            }, () => {
+                alert("No se pudo obtener tu ubicación GPS. Asegúrate de activarla.");
+            });
+        } else {
+            alert("Tu navegador no soporta geolocalización.");
+        }
+    }
+
+    function calcularDistanciaHaversine(lat1, lon1, lat2, lon2) {
+        const R = 6371; 
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    function enviarPedido() {
+        const nombre = document.getElementById('nombre').value;
+        const telefono = document.getElementById('telefono').value;
+        const calle = document.getElementById('calle').value;
+        const colonia = document.getElementById('colonia').value;
+        const referencias = document.getElementById('referencias').value;
+
+        if(!nombre || !telefono || !calle) {
+            alert("Por favor llena al menos tu Nombre, Teléfono y Dirección.");
+            return;
+        }
+
+        let detallePedido = "";
+        let subtotal = 0;
+        const items = document.querySelectorAll('.menu-item');
+        items.forEach(item => {
+            const nombreProd = item.getAttribute('data-name');
+            const precio = parseFloat(item.getAttribute('data-price'));
+            const cantidad = parseInt(item.querySelector('.counter-value').textContent);
+            if (cantidad > 0) {
+                detallePedido += `▪️ ${cantidad}x ${nombreProd} ($${precio * cantidad} MXN)\n`;
+                subtotal += precio * cantidad;
+            }
+        });
+
+        if (subtotal === 0) {
+            alert("Por favor selecciona al menos un producto de tu menú.");
+            return;
+        }
+
+        const totalFinal = subtotal + costoEnvioActual;
+        const negocioWhatsApp = "8112393650";
+
+        const mensaje = `*¡NUEVO PEDIDO - TEO BURGER CHULAVISTA!* 🍔\n\n` +
+                        `👤 *Cliente:* ${nombre}\n` +
+                        `📞 *Teléfono:* ${telefono}\n` +
+                        `🏠 *Dirección:* ${calle}, Col. ${colonia}\n` +
+                        `📍 *Referencias:* ${referencias}\n` +
+                        `📏 *Distancia:* ${distanciaKm.toFixed(1)} km\n\n` +
+                        `📋 *PEDIDO:*\n${detallePedido}\n` +
+                        `🍔 *Subtotal Comida:* $${subtotal} MXN\n` +
+                        `🛵 *Costo de Envio:* $${costoEnvioActual} MXN\n` +
+                        `💵 *TOTAL A PAGAR:* $${totalFinal} MXN\n` +
+                        `💳 *Forma de Pago:* ${formaPagoSeleccionada}`;
+
+        const urlWsp = `https://api.whatsapp.com/send?phone=${negocioWhatsApp}&text=${encodeURIComponent(mensaje)}`;
+        window.open(urlWsp, '_blank');
+    }
+</script>
+
+</body>
+</html>
